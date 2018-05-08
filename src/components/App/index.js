@@ -1,6 +1,13 @@
 import React, { PropTypes } from 'react';
 import Link from 'react-router/lib/Link';
+import booksApi from './books.js'
+
 import styles from './styles.scss';
+
+/*const bdata= 'hobbit';
+let datassss = booksApi.getAllBooks(bdata);
+console.log(datassss);*/
+
 
 function App({ children }) {
   return (

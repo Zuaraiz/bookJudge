@@ -6,14 +6,19 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "axios": "^0.18.0",
     "babel-polyfill": "6.26.0",
     "babel-preset-kyt-react": "0.3.0",
     "compression": "1.6.2",
     "express": "4.15.3",
+    "kyt": "0.9.0",
+    "material-ui": "^0.20.0",
     "react": "15.3.0",
     "react-dom": "15.3.0",
+    "react-redux": "^5.0.7",
     "react-router": "2.6.1",
-    "kyt": "0.9.0"
+    "redex": "0.0.1",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "enzyme": "2.4.1",
@@ -31,6 +36,16 @@
     "lint": "npm run lint-script && npm run lint-style",
     "lint-script": "kyt lint-script",
     "lint-style": "kyt lint-style",
-    "kyt:help": "kyt --help"
+    "kyt:help": "kyt --help",
+    "kyt:dev": "kyt dev",
+    "kyt:build": "kyt build",
+    "kyt:start": "node build/server/main.js",
+    "kyt:proto": "kyt proto",
+    "kyt:test": "kyt test",
+    "kyt:test-watch": "kyt test -- --watch",
+    "kyt:test-coverage": "kyt test -- --coverage",
+    "kyt:lint": "npm run lint-script && npm run lint-style",
+    "kyt:lint-script": "kyt lint-script",
+    "kyt:lint-style": "kyt lint-style"
   }
 }

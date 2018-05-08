@@ -1,3 +1,68 @@
+import React from 'react';
+import styles from './styles.scss';
+
+function Home() {
+  return (
+    <section>
+      <p className={styles.paragraph}>
+        Welcome to the <strong>Universal React Starter-kyt</strong>. This starter kyt should serve
+        as the base for an advanced, server-rendered React app.
+      </p>
+      <p className={styles.paragraph}>
+        Check out the Tools section for an outline of the libraries that are used in this
+        Starter-kyt.
+      </p>
+    </section>
+  );
+}
+
+export default Home;
+
+
+  onUpdateInput(inputValue) {
+    const self = this;
+    this.setState({
+      inputValue: inputValue
+    }, function() {
+      self.performSearch();
+    });
+  }
+
+
+
+
+
+
+
+
+import React from 'react';
+
+const Lists = (props) =>{
+    
+//    const mapval = props.map((props)=>{
+//       return <li>{props}</li>
+//    });
+    console.log('List props: ',props)
+    return(
+        <ul>
+            {props}
+        </ul>
+    );
+}
+export default  Lists;
+
+//{props.state.dataSource[0].page}
+ // page is : {props.dataSource[0].page}
+//working
+
+
+
+
+
+
+
+
+
 import React, {Component} from 'react';
 import booksApi from '../App/books.js';
 import Lists from '../Lists'
@@ -69,16 +134,21 @@ GoodReads() {
 //    }
 
 render() {
-    let x = this.state.dataSource[0].results;
-    console.log('x' , x);
-    console.log('datasrc' , this.state.dataSource[0].results);
+    let ww = [];
+    if(this.state.dataSource.length>0){
+        if(this.state.dataSource[0].results)
+            {
+                ww = this.state.dataSource[0].results[0].work;
+            }
+    }
+    console.log('tis is ww ', ww);
     //console.log('try :  ', this.state.dataSource[0].results[0].work[0].best_book[0].title)
     const config = { };
     return (
       <section>
         <input />
         <button className={styles.button} label="Find Book" onClick={this.handleClick} />
-        <Lists dp= {this.state.dataSource ? this.state.dataSource[0].query : 'No data available'}/>
+        <Lists props= {this.state.dataSource ? this.state.dataSource[0].query : 'No data available'}/>
         <div>   
         </div>
       </section>
