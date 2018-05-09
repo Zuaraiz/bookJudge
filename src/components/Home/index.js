@@ -7,14 +7,13 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataSource : [''],
+      dataSource : [],
       inputValue : ''
     }
       this.GoodReads = this.GoodReads.bind(this);
       //this.mapStateToProps = this.mapStateToProps.bind(this);
       this.handleClick = this.handleClick.bind(this);
       
-      this.GoodReads();
   }
     
 //componentWillMount()
@@ -22,32 +21,13 @@ class Home extends Component {
 //    
 //}
   componentWillReceiveProps(nextProps) {
-    if (nextProps.searchResults !== this.props.searchResults) {
-      const { query, items, totalResults } = nextProps.searchResults;
-      const dataSource = nextProps.books;
-      this.setState({ query });
-      if (items.length > 0) {
-        const bookData = items.filter((i, index) => index < 5).map(book => ({
-          name: books[book].title,
-          code: book,
-          author: books[book].author,
-          image: books[book].image,
-        }));
-        if (items.length > 5) {
-          bookData.push({
-            name: `${parseInt(totalResults, 10) - 5} Other Results`,
-            code: 'search',
-            author: query,
-            image: '',
-          });
-        }
-        this.setState({ dataSource: bookData });
-      }
-    }
+   
   }
 handleClick()
 {
     console.log('handler called')
+    
+      this.GoodReads()
 }
 
 GoodReads() {
@@ -55,8 +35,13 @@ GoodReads() {
     let result = [];
     booksApi.getAllBooks({query: search, page: '1'}).then((books) => {
         console.log('Result: ',books) //status 400
-
-        result = books;
+        
+        if(books[0])
+            {
+                if(books[0]["total-results"][0] > 0){
+                    result = books[0].results[0].work
+                }
+            }
         this.setState({dataSource: result})
     })
     debugger;
@@ -69,16 +54,14 @@ GoodReads() {
 //    }
 
 render() {
-    let x = this.state.dataSource[0].results;
-    console.log('x' , x);
-    console.log('datasrc' , this.state.dataSource[0].results);
+    console.log("Results", this.state.dataSource)
     //console.log('try :  ', this.state.dataSource[0].results[0].work[0].best_book[0].title)
     const config = { };
     return (
       <section>
         <input />
         <button className={styles.button} label="Find Book" onClick={this.handleClick} />
-        <Lists dp= {this.state.dataSource ? this.state.dataSource[0].query : 'No data available'}/>
+        <Lists dp= {this.state.dataSource}/>
         <div>   
         </div>
       </section>
