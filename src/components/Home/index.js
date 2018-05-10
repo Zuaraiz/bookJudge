@@ -19,49 +19,52 @@ class Home extends Component {
       dataSource : [],
       inputValue : ''
     }
-      this.GoodReads = this.GoodReads.bind(this);
       //this.mapStateToProps = this.mapStateToProps.bind(this);
       this.handleClick = this.handleClick.bind(this);
       this.handleChange = this.handleChange.bind(this);
       
   }
     
-componentWillMount()
-{
-    this.props.actions.loadBooks(this.state.inputValue);
-}
-  componentWillReceiveProps(nextProps) {
-   
-  }
+
+  
 handleClick()
 {
     console.log('handler called')
-      this.GoodReads();
 }
-GoodReads(searchTerm) {
-    var search = searchTerm;
-    let result = [];
-    booksApi.getAllBooks({query: search, page: '1'}).then((books) => {
-        console.log('Result: ',books) //status 400    
-        if(books[0])
-            {
-                if(books[0]["total-results"][0] > 0){
-                    result = books[0].results[0].work
-                }
-            }
-        this.setState({dataSource: result})
-    })
-    debugger;
-    console.log(result);
 
-}
 handleChange(event)
 {
     console.log('handler called')
     //let term = event.target.value
     this.setState({inputValue: event});
-      this.GoodReads(this.state.inputValue);
+    this.props.actions.loadBooks({query: event, page: '1'})
 }
+    componentWillReceiveProps(nextProps) {
+    if (nextProps.books !== this.props.books) {
+     let dataBooks = [];
+    let totalResults = 0;    
+    const {books} = nextProps;
+    if(books.length >0){
+        if(books[0]["total-results"][0]>0){
+            const query = books[0].query[0];
+            totalResults = books[0]["total-results"][0];
+            dataBooks = books[0].results[0].work.filter((i, index) => index < 5).map(book => ({
+            name: book.best_book[0].title[0],
+          code: book.best_book[0].id[0]._,
+          query,}))
+            if(totalResults > 5)
+                {
+                    dataBooks.push({
+                        name: (totalResults - 5) + " Other Results",
+                        code: "search",
+                        query: books[0].query[0],
+                    })
+                }
+            this.setState({dataSource: dataBooks})
+        }
+    }
+    }
+  }
 //componentDidMount()
 //    {
 //        console.log('datasrc after' , this.state.dataSource);
@@ -70,6 +73,9 @@ handleChange(event)
 render() {
     
 	console.log('Home Props State: ', this.props)
+    
+                                                      
+    const dataConfig = {text : "name", value: "code", option: "query"}
     console.log("Results", this.state.dataSource)
     //console.log('try :  ', this.state.dataSource[0].results[0].work[0].best_book[0].title)
     const config = { };
@@ -79,13 +85,17 @@ render() {
         <div>
         
           <AutoComplete
+            hintText="Search Book"
+            filter={AutoComplete.noFilter}
             dataSource    = {this.state.dataSource}
-            onUpdateInput = {this.handleChange} />
+            dataSourceConfig={dataConfig}
+            onUpdateInput = {this.handleChange}
+            floatingLabelText="Search Book"
+            openOnFocus={true} />
           
-        <button className={styles.button} label="Find Book" onClick={this.handleClick} />
+        <button className={styles.button} label="Find Book" onClick={this.handleClick} >Search</button>
         </div>
-        <div>
-        <Lists dp= {this.state.dataSource}/>
+        <div>   
         </div>
         </section>
  </MuiThemeProvider>
