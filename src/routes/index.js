@@ -41,8 +41,8 @@ const importBooks = (nextState, cb) => {
 const routes = (
   <Route path="/" component={App}>
     <IndexRoute getComponent={importHome} />
-    <Route path="search" getComponent={importSearch} />
-    <Route path="book" getComponent={importBooks} />
+    <Route path="search/:query" getComponent={importSearch} />
+    <Route path="book/:id" getComponent={importBooks} />
     <Route path="tools" getComponent={importTools} />
   </Route>
 );

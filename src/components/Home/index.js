@@ -17,11 +17,13 @@ class Home extends Component {
     super(props);
     this.state = {
       dataSource : [],
-      inputValue : ''
+      inputValue : '',
+      query : ''
     }
       //this.mapStateToProps = this.mapStateToProps.bind(this);
       this.handleClick = this.handleClick.bind(this);
       this.handleChange = this.handleChange.bind(this);
+      this.handleNewRequest = this.handleNewRequest.bind(this);
       
   }
     
@@ -30,6 +32,24 @@ class Home extends Component {
 handleClick()
 {
     console.log('handler called')
+    const { inputValue } = this.state;
+    const { history } = this.props;
+
+    if (inputValue.length > 0) {
+      // history.push('/search/' + value);
+      history.push(`/search/${inputValue}`);
+    }
+
+    event.preventDefault();
+}
+handleNewRequest(chosenRequest)
+{
+    console.log('new request called')
+    if (chosenRequest.code === 'search') {
+        this.props.history.push(`/search/${chosenRequest.query}`);
+      } else {
+        this.props.history.push(`/book/${chosenRequest.code}`);
+    }
 }
 
 handleChange(event)
@@ -39,44 +59,39 @@ handleChange(event)
     this.setState({inputValue: event});
     this.props.actions.loadBooks({query: event, page: '1'})
 }
-    componentWillReceiveProps(nextProps) {
+componentWillReceiveProps(nextProps) {
     if (nextProps.books !== this.props.books) {
-     let dataBooks = [];
-    let totalResults = 0;    
-    const {books} = nextProps;
-    if(books.length >0){
-        if(books[0]["total-results"][0]>0){
-            const query = books[0].query[0];
-            totalResults = books[0]["total-results"][0];
-            dataBooks = books[0].results[0].work.filter((i, index) => index < 5).map(book => ({
-            name: book.best_book[0].title[0],
-          code: book.best_book[0].id[0]._,
-          query,}))
-            if(totalResults > 5)
-                {
-                    dataBooks.push({
-                        name: (totalResults - 5) + " Other Results",
-                        code: "search",
-                        query: books[0].query[0],
-                    })
-                }
-            this.setState({dataSource: dataBooks})
+        let dataBooks = [];
+        let totalResults = 0;    
+        const {books} = nextProps;
+        if(books.length >0){
+            if(books[0]["total-results"][0]>0){
+                const query = books[0].query[0];
+                totalResults = books[0]["total-results"][0];
+                dataBooks = books[0].results[0].work.filter((i, index) => index < 5).map(book => ({
+                name: book.best_book[0].title[0],
+                code: book.best_book[0].id[0]._,
+                query,}))
+                if(totalResults > 5)
+                    {
+                        dataBooks.push({
+                            name: (totalResults - 5) + " Other Results",
+                            code: "search",
+                            query: books[0].query[0],
+                        })
+                    }
+                this.setState({dataSource: dataBooks})
+            }
         }
     }
-    }
-  }
-//componentDidMount()
-//    {
-//        console.log('datasrc after' , this.state.dataSource);
-//    }
-
+}
 render() {
     
 	console.log('Home Props State: ', this.props)
     
                                                       
     const dataConfig = {text : "name", value: "code", option: "query"}
-    console.log("Results", this.state.dataSource)
+    console.log("home k Results", this.state.dataSource)
     //console.log('try :  ', this.state.dataSource[0].results[0].work[0].best_book[0].title)
     const config = { };
     return (
@@ -91,7 +106,8 @@ render() {
             dataSourceConfig={dataConfig}
             onUpdateInput = {this.handleChange}
             floatingLabelText="Search Book"
-            openOnFocus={true} />
+            openOnFocus={true}
+            onNewRequest={this.handleNewRequest} />
           
         <button className={styles.button} label="Find Book" onClick={this.handleClick} >Search</button>
         </div>
