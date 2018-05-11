@@ -9,7 +9,17 @@ import RaisedButton from 'material-ui/RaisedButton';
 import List, { ListItem } from 'material-ui/List';
 import getMuiTheme        from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider   from 'material-ui/styles/MuiThemeProvider';
-
+import Waypoint from 'react-waypoint';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
+const style = {
+  container: {
+    position: 'relative',
+  },
+  refresh: {
+    display: 'inline-block',
+    position: 'relative',
+  },
+};
 class Search extends Component
 {
   constructor(props) {
@@ -17,26 +27,37 @@ class Search extends Component
     this.state = {
       dataSource : [],
       inputValue : '',
-      query : this.props.params.query
+      query : this.props.params.query,
+      totalResult :  123,
+      totalPages : 0,
+      pageNumber : 1
+
     }
       //this.mapStateToProps = this.mapStateToProps.bind(this);
       //this.onBookClick = this.onBookClick.bind(this);
+      this.handleLoadMore = this.handleLoadMore.bind(this);
       
   }
   componentWillMount(){
-    this.props.actions.loadBooks({query: this.state.query, page: '1'})
+    this.props.actions.loadBooks({query: this.state.query, page: (this.state.pageNumber++).toString()})
   }
 componentWillReceiveProps(nextProps) {
   
     if (nextProps.books !== this.props.books) {
-      this.props.actions.loadBooks({query: this.state.query, page: '1'})
+      
         let dataBooks = [];
-        let totalResults = 0;    
+        let totalResults = 0;  
+        let totalp= 2;
         const {books} = nextProps;  
         if(books.length >0){
             if(books[0]["total-results"][0]>0){
+              
+                                                                  console.log('total Results init',this.state.totalResult)
+                                                                  console.log('total pages init',this.state.totalPages)
+                                                                  console.log('books',books[0])
                 const query = books[0].query[0];
                 totalResults = books[0]["total-results"][0];
+                totalp = parseInt(totalResults/20);
                 dataBooks = books[0].results[0].work.map(book => ({
                 name: book.best_book[0].title[0],
                 code: book.best_book[0].id[0]._,
@@ -44,21 +65,37 @@ componentWillReceiveProps(nextProps) {
                 author: book.best_book[0].author[0].name,
                 query,}))
                 
-                this.setState({dataSource: dataBooks})
+                 this.setState({dataSource: [...this.state.dataSource,...dataBooks]})
+                 this.setState({totalResult: totalResults})
+                 this.setState({totalPages: totalp});
+                //this.setState({dataSource: dataBooks})
+                //this.setState({pageNumber: this.state.pageNumber+1})
             }
         }
     }
 }
+handleLoadMore()
+{
+  this.props.actions.loadBooks({query: this.state.query, page: (this.state.pageNumber++).toString()})
+}
+
 onBookClick(id)
 {
   this.props.history.push(`/book/${id}`);
 
 }
+
   render(){
     const dataConfig = {text : "name", value: "code", option: "query", photo : "image", author: "author"}
-    console.log('search Props State: ', this.props)
-    console.log('search k data result', this.state.dataSource)
+                                          console.log('search Props State: ', this.props)
+                                          console.log('search k data result', this.state.dataSource)
+                                          console.log('total results render',this.state.totalResult)
+                                          console.log('total pages render',this.state.totalPages)
+
+    
     let data = [];
+    let page = this.state.pageNumber;
+    let totalpages = this.state.totalPages;
     data = this.state.dataSource;
     console.log('data', data);
     if(data.length > 0){
@@ -85,6 +122,22 @@ onBookClick(id)
 
 
             </List>
+            {page <= totalpages
+                ? <div className="infinite-scroll-example__waypoint">
+                    <Waypoint onEnter={this.handleLoadMore} />
+                    <div style={style.container}>
+                      <center>
+                        <RefreshIndicator
+                          size={40}
+                          left={0}
+                          top={20}
+                          status="loading"
+                          style={style.refresh}
+                        />
+                      </center>
+                    </div>
+                  </div>
+                : <p />}
 
           </section>
           </MuiThemeProvider>

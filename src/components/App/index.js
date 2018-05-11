@@ -13,7 +13,13 @@ function App({ children }) {
       <Provider store={store}>
       <MuiThemeProvider>
     <div>
-      <ul className={styles.nav}></ul>
+      <ul className={styles.nav}>
+        <li className={styles.navItem}>
+          <Link className={styles.link} to="/">
+            Home
+          </Link>
+        </li>
+        </ul>
       <div className={styles.content}>
         {children}
       </div>
