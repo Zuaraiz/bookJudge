@@ -1,11 +1,11 @@
 import {combineReducers} from 'redux';
-import book from './SingleBookReducer';
-import books from './bookReducer';
+import books from './SingleBookReducer';
+import SearchResult from './bookReducer';
 
 
 const rootReducer = combineReducers({
   // short hand property names
-  books, book
+  books, SearchResult
 })
 
 export default rootReducer;

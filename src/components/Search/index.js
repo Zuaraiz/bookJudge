@@ -30,7 +30,8 @@ class Search extends Component
       query : this.props.params.query,
       totalResult :  123,
       totalPages : 0,
-      pageNumber : 1
+      pageNumber : 1,
+      isLoading : false
 
     }
       //this.mapStateToProps = this.mapStateToProps.bind(this);
@@ -43,26 +44,25 @@ class Search extends Component
   }
 componentWillReceiveProps(nextProps) {
   
-    if (nextProps.books !== this.props.books) {
+    if (nextProps.SearchResult !== this.props.SearchResult) {
       
         let dataBooks = [];
         let totalResults = 0;  
         let totalp= 2;
-        const {books} = nextProps;  
-        if(books.length >0){
-            if(books[0]["total-results"][0]>0){
+        const {BookList, TotalResults, Query, isLoading} = nextProps.SearchResult
+        console.log('isLoading', isLoading)
+        const books = nextProps.books 
+        if(BookList.length > 0){
+            if(TotalResults > 0){
               
-                                                                  console.log('total Results init',this.state.totalResult)
-                                                                  console.log('total pages init',this.state.totalPages)
-                                                                  console.log('books',books[0])
-                const query = books[0].query[0];
-                totalResults = books[0]["total-results"][0];
+                const query = Query;
+                totalResults = TotalResults
                 totalp = parseInt(totalResults/20);
-                dataBooks = books[0].results[0].work.map(book => ({
-                name: book.best_book[0].title[0],
-                code: book.best_book[0].id[0]._,
-                image: book.best_book[0].image_url,
-                author: book.best_book[0].author[0].name,
+                dataBooks = BookList.map(book => ({
+                name: books[book].title,
+                code: book,
+                image: books[book].image,
+                author: books[book].author,
                 query,}))
                 
                  this.setState({dataSource: [...this.state.dataSource,...dataBooks]})
@@ -76,6 +76,7 @@ componentWillReceiveProps(nextProps) {
 }
 handleLoadMore()
 {
+  this.setState({isLoading : true})
   this.props.actions.loadBooks({query: this.state.query, page: (this.state.pageNumber++).toString()})
 }
 
@@ -154,13 +155,14 @@ onBookClick(id)
 
 }
 Search.propTypes = {
-  books: PropTypes.array.isRequired
+  SearchResult: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
 	console.log('Props State: ', state.books)
     return {
-      books: state.books
+      SearchResult: state.SearchResult,
+      books : state.books
     };
  
   

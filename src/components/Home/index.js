@@ -60,27 +60,34 @@ handleChange(event)
     this.props.actions.loadBooks({query: event, page: '1'})
 }
 componentWillReceiveProps(nextProps) {
-    if (nextProps.books !== this.props.books) {
+    if (nextProps.SearchResult !== this.props.SearchResult) {
         let dataBooks = [];
-        let totalResults = 0;    
-        const {books} = nextProps;
-        if(books.length >0){
-            if(books[0]["total-results"][0]>0){
-                const query = books[0].query[0];
-                totalResults = books[0]["total-results"][0];
-                dataBooks = books[0].results[0].work.filter((i, index) => index < 5).map(book => ({
-                name: book.best_book[0].title[0],
-                code: book.best_book[0].id[0]._,
-                query,}))
-                if(totalResults > 5)
+        const {BookList, TotalResults, Query} = nextProps.SearchResult
+        const books = nextProps.books
+        let totalResults = 0;
+        console.log(Query)
+        console.log(books)
+        console.log(TotalResults)
+        console.log('BookList', BookList)
+        if(BookList.length > 0){
+            if(TotalResults>0){
+                const query = Query;
+                totalResults = TotalResults;
+                dataBooks = BookList.filter((i, index) => index < 5).map(book => ({
+                name: books[book].title,
+                code: book,
+                query,
+            }))
+                if(TotalResults > 5)
                     {
                         dataBooks.push({
                             name: (totalResults - 5) + " Other Results",
                             code: "search",
-                            query: books[0].query[0],
+                            query: Query,
                         })
                     }
                 this.setState({dataSource: dataBooks})
+                console.log(this.state.dataSource)
             }
         }
     }
@@ -123,13 +130,15 @@ render() {
 
 }
 Home.propTypes = {
-  books: PropTypes.array.isRequired
+  SearchResult: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
-	console.log('Props State: ', state.books)
+    console.log('SearchResult Props State home: ', state.SearchResult)
+    console.log('books Props State home: ', state.books)
     return {
-      books: state.books
+        SearchResult: state.SearchResult,
+        books : state.books
     };
  
   

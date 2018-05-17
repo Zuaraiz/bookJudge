@@ -1,2 +1,1 @@
-export const LOAD_BOOKS_SUCCESS = 'LOAD_BOOKS_SUCCESS';
-export const LOAD_SINGLE_BOOK = 'LOAD_SINGLE_BOOK';
+export const LOAD_BOOKS = 'LOAD_BOOKS';

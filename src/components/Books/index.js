@@ -14,58 +14,42 @@ import styles from './styles.scss';
 
 class Books extends Component {
 
-    constructor(props) {
-      super(props);
-      this.state = {
-        dataSource : [],
-        inputValue : '',
-        query : this.props.params.id
-      }
-        //this.mapStateToProps = this.mapStateToProps.bind(this);
-        //this.onBookClick = this.onBookClick.bind(this);
-        
-    }
-    componentWillMount(){
-      this.props.actions.loadSingleBook(this.state.query)
-    }
+  constructor(props) {
+    super(props);
+    const { books, params } = props;
+    this.state = {
+      bookid: params.id,
+      book: books[params.id],
+    };
+  }
   componentWillReceiveProps(nextProps) {
     
-      if (nextProps.book !== this.props.book) {
-          let dataBooks = [];
-          let totalResults = 0;    
-          const {book} = nextProps;  
-          
-            const bookData = book.title ? {    
-                  name: book.title[0],
-                  image: book.image_url,
-                  author: book.authors[0].author[0].name,
-                  averageRating : book.average_rating[0],
-                  rating_count :book.ratings_count[0]
-            } : {}
-                  this.setState({dataSource: bookData})
-                  console.log('bookdata', bookData);
-              }
+      if (nextProps.books !== this.props.books) {
+          const { params, books } = this.props;
+          const { bookid } = params.id;
+          const book = books[params];
+          this.setState({ bookid, book });
+        }
   }
     render(){
-      const data = this.state.dataSource;
-      console.log('data', data);
-      if (data.name)
+      const {book} = this.state
+      if (book)
       {
 
         return (
           <MuiThemeProvider muiTheme={getMuiTheme()}>
             <Card  className={styles.logo}>
               <CardMedia className={styles.logo}>
-                <img className={styles.logo} src={data.image} alt="" />
+                <img className={styles.logo} src={book.image} alt="" />
               </CardMedia>
-              <CardTitle title={data.name} subtitle={data.author} />
+              <CardTitle title={book.title} subtitle={book.author} />
               <CardText>
                 <p>
-                  Average Rating:{data.averageRating}
+                  Average Rating:{book.averageRating}
                 </p>
 
                 <p>
-                  Rating Count: {data.rating_count}
+                  Rating Count: {book.ratingCount}
                 </p>
               </CardText>
             </Card>
@@ -86,7 +70,7 @@ class Books extends Component {
   function mapStateToProps(state, ownProps) {
     console.log('Props State: ', state.books)
       return {
-        book: state.book
+        books: state.books
       };
    
     
