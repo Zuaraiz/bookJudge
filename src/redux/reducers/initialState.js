@@ -9,11 +9,11 @@ export default {
       ratingCount : 'BookRatingCount'
     },
   },
-  SearchResult: {
+  searchResult: {
     isLoading : false,
-    BookList : [],
-    TotalResults : 0,
-    Query : 'Search'
+    bookList : [],
+    totalResults : 0,
+    query : 'Search'
 
   },
 };

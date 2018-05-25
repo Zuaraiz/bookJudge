@@ -3,15 +3,16 @@ import initialState from './initialState';
 import {browserHistory} from 'react-router';
 
 
-export default function SingleBookReducer(state = {}, action) {
-    const APIresponse = action.books
+export default function books(state = {}, action) {
+    const apiResponse = action.books
+    console.log('state',state)
     switch(action.type) {
       case types.LOAD_BOOKS:
-        const TotalResults = APIresponse[0]["total-results"][0];
+        const totalResults = apiResponse[0]["total-results"][0];
         const nextState = state;
-        if(TotalResults > 0){
-          const AllBooksArray = APIresponse[0].results[0].work;
-          AllBooksArray.forEach(element => {
+        if(totalResults > 0){
+          const allBooksArray = apiResponse[0].results[0].work;
+          allBooksArray.forEach(element => {
             const bestBook = element.best_book[0];
             nextState[`${bestBook.id[0]._}`] = {
               id: bestBook.id[0]._,

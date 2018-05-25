@@ -28,10 +28,10 @@ class Search extends Component
       dataSource : [],
       inputValue : '',
       query : this.props.params.query,
-      totalResult :  123,
+      totalResult :  0,
       totalPages : 0,
       pageNumber : 1,
-      isLoading : false
+      isLoading : this.props.searchResult.isLoading
 
     }
       //this.mapStateToProps = this.mapStateToProps.bind(this);
@@ -44,30 +44,29 @@ class Search extends Component
   }
 componentWillReceiveProps(nextProps) {
   
-    if (nextProps.SearchResult !== this.props.SearchResult) {
+    if (nextProps.searchResult !== this.props.searchResult) {
       
         let dataBooks = [];
-        let totalResults = 0;  
-        let totalp= 2;
-        const {BookList, TotalResults, Query, isLoading} = nextProps.SearchResult
+        let totalpage= 2;
+        const {bookList, totalResults, query, isLoading} = nextProps.searchResult
         console.log('isLoading', isLoading)
+        //this.setState({isLoading: isLoading})
+        console.log('isLoadingState', this.state.isLoading)
         const books = nextProps.books 
-        if(BookList.length > 0){
-            if(TotalResults > 0){
-              
-                const query = Query;
-                totalResults = TotalResults
-                totalp = parseInt(totalResults/20);
-                dataBooks = BookList.map(book => ({
+        console.log('nextProps.books',nextProps.books)
+        if(bookList.length > 0){
+            if(totalResults > 0){
+                totalpage = parseInt(totalResults/20);
+                dataBooks = bookList.map(book => ({
                 name: books[book].title,
                 code: book,
                 image: books[book].image,
                 author: books[book].author,
-                query,}))
+                query: query,}))
                 
                  this.setState({dataSource: [...this.state.dataSource,...dataBooks]})
                  this.setState({totalResult: totalResults})
-                 this.setState({totalPages: totalp});
+                 this.setState({totalPages: totalpage});
                 //this.setState({dataSource: dataBooks})
                 //this.setState({pageNumber: this.state.pageNumber+1})
             }
@@ -76,12 +75,13 @@ componentWillReceiveProps(nextProps) {
 }
 handleLoadMore()
 {
-  this.setState({isLoading : true})
+  //this.setState({isLoading : true})
   this.props.actions.loadBooks({query: this.state.query, page: (this.state.pageNumber++).toString()})
 }
 
 onBookClick(id)
 {
+  console.log(this.state.isLoading)
   this.props.history.push(`/book/${id}`);
 
 }
@@ -123,7 +123,7 @@ onBookClick(id)
 
 
             </List>
-            {page <= totalpages
+            {(page <= totalpages) && (this.state.isLoading = true)
                 ? <div className="infinite-scroll-example__waypoint">
                     <Waypoint onEnter={this.handleLoadMore} />
                     <div style={style.container}>
@@ -147,7 +147,22 @@ onBookClick(id)
 
     }
     else {
-      return(<center><p>wait while the search is being conducted</p></center>);
+      return(
+        
+        <MuiThemeProvider muiTheme={getMuiTheme()}>
+        <center>
+        <p>Wait while the search is being conducted</p>
+        <RefreshIndicator
+          size={40}
+          left={0}
+          top={20}
+          status="loading"
+          style={style.refresh}
+        />
+      </center>
+      </MuiThemeProvider>
+
+        );
     }
     
   }
@@ -155,13 +170,13 @@ onBookClick(id)
 
 }
 Search.propTypes = {
-  SearchResult: PropTypes.object.isRequired
+  searchResult: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
 	console.log('Props State: ', state.books)
     return {
-      SearchResult: state.SearchResult,
+      searchResult: state.searchResult,
       books : state.books
     };
  

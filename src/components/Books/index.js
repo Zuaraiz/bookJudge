@@ -17,6 +17,7 @@ class Books extends Component {
   constructor(props) {
     super(props);
     const { books, params } = props;
+    console.log('bp',props)
     this.state = {
       bookid: params.id,
       book: books[params.id],

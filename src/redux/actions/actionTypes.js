@@ -1,1 +1,2 @@
 export const LOAD_BOOKS = 'LOAD_BOOKS';
+export const LOAD_BOOKS_LOADING = 'LOAD_BOOKS_LOADING';

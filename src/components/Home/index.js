@@ -11,14 +11,29 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import getMuiTheme        from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider   from 'material-ui/styles/MuiThemeProvider';
-
+import Waypoint from 'react-waypoint';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
+const style = {
+    container: {
+      position: 'relative',
+    },
+    refresh: {
+      display: 'inline-block',
+      position: 'relative',
+      margin : '1em',
+    },
+  };
+  var divStyle = {
+    width: '100%'
+  };
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       dataSource : [],
       inputValue : '',
-      query : ''
+      query : '',
+      isLoading : this.props.searchResult.isLoading
     }
       //this.mapStateToProps = this.mapStateToProps.bind(this);
       this.handleClick = this.handleClick.bind(this);
@@ -56,34 +71,33 @@ handleChange(event)
 {
     console.log('handler called')
     //let term = event.target.value
+    //this.setState({isLoading: true})
     this.setState({inputValue: event});
     this.props.actions.loadBooks({query: event, page: '1'})
 }
 componentWillReceiveProps(nextProps) {
-    if (nextProps.SearchResult !== this.props.SearchResult) {
+    if (nextProps.searchResult !== this.props.searchResult) {
         let dataBooks = [];
-        const {BookList, TotalResults, Query} = nextProps.SearchResult
+        const {isLoading, bookList, totalResults, query} = nextProps.searchResult
+        this.setState({isLoading})
         const books = nextProps.books
-        let totalResults = 0;
-        console.log(Query)
+        console.log(query)
         console.log(books)
-        console.log(TotalResults)
-        console.log('BookList', BookList)
-        if(BookList.length > 0){
-            if(TotalResults>0){
-                const query = Query;
-                totalResults = TotalResults;
-                dataBooks = BookList.filter((i, index) => index < 5).map(book => ({
+        console.log(totalResults)
+        console.log('bookList', bookList)
+        if(bookList.length > 0){
+            if(totalResults>0){
+                dataBooks = bookList.filter((i, index) => index < 5).map(book => ({
                 name: books[book].title,
                 code: book,
-                query,
+                query: query,
             }))
-                if(TotalResults > 5)
+                if(totalResults > 5)
                     {
                         dataBooks.push({
                             name: (totalResults - 5) + " Other Results",
                             code: "search",
-                            query: Query,
+                            query: query,
                         })
                     }
                 this.setState({dataSource: dataBooks})
@@ -92,6 +106,7 @@ componentWillReceiveProps(nextProps) {
         }
     }
 }
+
 render() {
     
 	console.log('Home Props State: ', this.props)
@@ -99,27 +114,42 @@ render() {
                                                       
     const dataConfig = {text : "name", value: "code", option: "query"}
     console.log("home k Results", this.state.dataSource)
+    console.log ('input val' ,this.state.inputValue)
+    console.log ('lading val' ,this.state.isLoading)
     //console.log('try :  ', this.state.dataSource[0].results[0].work[0].best_book[0].title)
     const config = { };
     return (
         <MuiThemeProvider muiTheme={getMuiTheme()}>
         <section>
         <div>
-        
-          <AutoComplete
-            hintText="Search Book"
-            filter={AutoComplete.noFilter}
-            dataSource    = {this.state.dataSource}
-            dataSourceConfig={dataConfig}
-            onUpdateInput = {this.handleChange}
-            floatingLabelText="Search Book"
-            openOnFocus={true}
-            onNewRequest={this.handleNewRequest} />
-          
-        <button className={styles.button} label="Find Book" onClick={this.handleClick} >Search</button>
+            <div >
+            <AutoComplete
+                hintText="Search Book"
+                filter={AutoComplete.noFilter}
+                dataSource    = {this.state.dataSource}
+                dataSourceConfig={dataConfig}
+                onUpdateInput = {this.handleChange}
+                floatingLabelText="Search Book"
+                openOnFocus={true}
+                onNewRequest={this.handleNewRequest} />
+                
+                {(this.state.inputValue!='') & (this.state.isLoading != false)? 
+                            <RefreshIndicator
+                            size={40}
+                            left={0}
+                            top={20}
+                            status="loading"
+                            style={style.refresh}
+                            />
+                    : <p />}
+            </div>  
+            <div>
+            <button className={styles.button} label="Find Book" onClick={this.handleClick} >Search</button>
+            </div>
         </div>
         <div>   
         </div>
+        
         </section>
  </MuiThemeProvider>
 
@@ -130,14 +160,14 @@ render() {
 
 }
 Home.propTypes = {
-  SearchResult: PropTypes.object.isRequired
+  searchResult: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
-    console.log('SearchResult Props State home: ', state.SearchResult)
+    console.log('searchResult Props State home: ', state.searchResult)
     console.log('books Props State home: ', state.books)
     return {
-        SearchResult: state.SearchResult,
+        searchResult: state.searchResult,
         books : state.books
     };
  
